@@ -153,46 +153,46 @@ st.title("Fraud Detection Model Dashboard")
 # Sidebar navigation
 st.sidebar.title("Navigation")
 section = st.sidebar.radio("Go to", ["Model Overview", "Adversarial Attacks", "Explainability", "Interactive Prediction Tool"])
-    # Performance metrics on clean test data
-    clean_acc, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(model, X_test, y_test, threshold=0.5)
+# Performance metrics on clean test data
+clean_acc, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(model, X_test, y_test, threshold=0.5)
     
-    # Store clean accuracy in session state
-    st.session_state.clean_acc = clean_acc
+# Store clean accuracy in session state
+st.session_state.clean_acc = clean_acc
 
-    st.subheader("Performance on Clean Data")
-    st.write(f"Accuracy: {clean_acc:.4f}")
-    st.write(f"Precision: {clean_precision:.4f}")
-    st.write(f"Recall: {clean_recall:.4f}")
-    st.write(f"F1-Score: {clean_f1:.4f}")
+st.subheader("Performance on Clean Data")
+st.write(f"Accuracy: {clean_acc:.4f}")
+st.write(f"Precision: {clean_precision:.4f}")
+st.write(f"Recall: {clean_recall:.4f}")
+st.write(f"F1-Score: {clean_f1:.4f}")
 
-    # Performance metrics on adversarial test data
-    adv_acc, adv_precision, adv_recall, adv_f1, y_pred_adv = get_model_performance(model, X_adv_test, y_test, threshold=0.5)
-    st.subheader("Performance on Adversarial Data")
-    st.write(f"Accuracy: {adv_acc:.4f}")
-    st.write(f"Precision: {adv_precision:.4f}")
-    st.write(f"Recall: {adv_recall:.4f}")
-    st.write(f"F1-Score: {adv_f1:.4f}")
+# Performance metrics on adversarial test data
+adv_acc, adv_precision, adv_recall, adv_f1, y_pred_adv = get_model_performance(model, X_adv_test, y_test, threshold=0.5)
+st.subheader("Performance on Adversarial Data")
+st.write(f"Accuracy: {adv_acc:.4f}")
+st.write(f"Precision: {adv_precision:.4f}")
+st.write(f"Recall: {adv_recall:.4f}")
+st.write(f"F1-Score: {adv_f1:.4f}")
 
-    # Display confusion matrix for clean data
-    st.subheader("Confusion Matrix for Clean Data")
-    cm = confusion_matrix(y_test, y_pred)
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-    plt.title("Confusion Matrix (Clean Data)")
-    st.pyplot()
+# Display confusion matrix for clean data
+st.subheader("Confusion Matrix for Clean Data")
+ cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+plt.title("Confusion Matrix (Clean Data)")
+st.pyplot()
 
-    # Display confusion matrix for adversarial data
-    st.subheader("Confusion Matrix for Adversarial Data")
-    cm_adv = confusion_matrix(y_test, y_pred_adv)
-    sns.heatmap(cm_adv, annot=True, fmt="d", cmap="Blues")
-    plt.title("Confusion Matrix (Adversarial Data)")
-    st.pyplot()
+# Display confusion matrix for adversarial data
+st.subheader("Confusion Matrix for Adversarial Data")
+cm_adv = confusion_matrix(y_test, y_pred_adv)
+sns.heatmap(cm_adv, annot=True, fmt="d", cmap="Blues")
+plt.title("Confusion Matrix (Adversarial Data)")
+st.pyplot()
 
-    # Visualize fraud vs non-fraud transaction distribution
-    st.subheader("Transaction Distribution")
-    fraud_count = pd.Series(y_test).value_counts()
-    sns.barplot(x=fraud_count.index, y=fraud_count.values)
-    plt.title('Distribution of Fraud vs Non-Fraud Transactions')
-    st.pyplot()
+# Visualize fraud vs non-fraud transaction distribution
+st.subheader("Transaction Distribution")
+fraud_count = pd.Series(y_test).value_counts()
+sns.barplot(x=fraud_count.index, y=fraud_count.values)
+plt.title('Distribution of Fraud vs Non-Fraud Transactions')
+st.pyplot()
 
 
 
