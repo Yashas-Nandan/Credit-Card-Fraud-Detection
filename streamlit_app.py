@@ -12,15 +12,9 @@ import tensorflow as tf
 # Load or train your model here
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-zip_file_path = 'creditcard.zip'
 
-# Open the zip file
-with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-    csv_filename = 'creditcard.csv'
-
-    with zip_ref.open(csv_filename) as csv_file:
-        data = pd.read_csv(csv_file)
-        st.write(data)
+data = pd.read_csv(csv_file)
+st.write(data)
 def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
     # Ensure the model is in evaluation mode
     model.eval()
