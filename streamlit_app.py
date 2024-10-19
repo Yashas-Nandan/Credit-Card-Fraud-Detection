@@ -17,7 +17,7 @@ X = data.iloc[:, :-1].values  # Features
 y = data.iloc[:, -1].values  # Target labels
 
 # Split dataset into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.8, random_state=42, stratify=y)
 
 # Function to create adversarial examples
 def generate_adversarial_examples(X, epsilon=0.1):
