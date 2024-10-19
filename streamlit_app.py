@@ -171,7 +171,7 @@ elif section == "Find Fraud Transactions":
     fraud_indices = find_fraud_transactions(model, X_test)
     
     # Display results
-    if len(fraud_indices) > 0:
+    if len(fraud_indices) == 1:
         st.success(f"Found {len(fraud_indices)} fraudulent transactions!")
         st.write("Fraudulent Transaction Indices:", fraud_indices.tolist())
     else:
