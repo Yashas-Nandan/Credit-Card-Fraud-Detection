@@ -26,7 +26,7 @@ This repository implements a machine learning solution for detecting credit card
 - **Evaluation Metrics:** Accuracy, precision, recall, F1-score, AUC-ROC.
 - **Confusion Matrix:** Analyze true/false positives and negatives.
 - **AUC-ROC & Precision-Recall Curves:** Visualize model performance.
-- **SHAP Explainability:** Understand feature importance and individual predictions.
+- **Explainability:** Understand feature importance and individual predictions.
 
 ### Fine-Tuning
 
@@ -37,14 +37,22 @@ This repository implements a machine learning solution for detecting credit card
 ### Model Deployment
 
 - **Real-Time Predictions:** User inputs transaction data for immediate fraud detection.
-- **UI Features:** Confusion matrix, AUC-ROC, SHAP visualizations.
+- **UI Features:** Confusion matrix, AUC-ROC, visualizations.
 - **User Authentication:** Optional security feature for access.
 - **Deployment:** Host the app on Streamlit Cloud or any other cloud provider.
 
 ### Advanced Enhancements
 
 - **Adversarial Defense:** Techniques like adversarial training and gradient masking.
-- **Ensemble Models:** Optionally integrate Random Forest or Gradient Boosting models for comparison.
+
+# Dataset
+
+https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud
+
+# References
+
+Libraries used can be found in requirements.txt
+
 
 # Authors
 1. Prashanth S (BMSCE)
