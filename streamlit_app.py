@@ -6,6 +6,7 @@ import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE  # Import SMOTE
 import tensorflow as tf
 
 # Load your trained model
@@ -16,8 +17,30 @@ data = pd.read_csv('creditcard.csv')  # Replace with your actual dataset path
 X = data.iloc[:, :-1].values  # Features
 y = data.iloc[:, -1].values  # Target labels
 
-# Split dataset into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+# Separate the fraud and non-fraud transactions
+fraud_cases = data[data['Class'] == 1]
+non_fraud_cases = data[data['Class'] == 0]
+
+# Limit the number of fraud cases in the test set to 1
+test_fraud_case = fraud_cases.sample(n=1, random_state=42)
+
+# Use all but one of the non-fraud cases for testing
+non_fraud_cases_test = non_fraud_cases.sample(n=len(non_fraud_cases) - 1, random_state=42)
+
+# Combine test set
+X_test = np.vstack((test_fraud_case.iloc[:, :-1].values, non_fraud_cases_test.iloc[:, :-1].values))
+y_test = np.hstack((test_fraud_case.iloc[:, -1].values, non_fraud_cases_test.iloc[:, -1].values))
+
+# Prepare training data using all other non-fraud cases
+remaining_non_fraud_cases = non_fraud_cases.drop(non_fraud_cases_test.index)
+
+# Now create the training set with the remaining non-fraud cases
+X_train = remaining_non_fraud_cases.iloc[:, :-1].values
+y_train = remaining_non_fraud_cases.iloc[:, -1].values
+
+# Apply SMOTE to the training set
+smote = SMOTE(random_state=42)
+X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
 # Function to create adversarial examples
 def generate_adversarial_examples(X, epsilon=0.1):
@@ -43,7 +66,7 @@ def get_model_performance(model, X, y):
 clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
 
 # Create a SHAP explainer
-explainer = shap.Explainer(model, X_train)
+explainer = shap.Explainer(model, X_train_resampled)
 
 # Main app
 st.title("Fraud Detection Model Dashboard")
