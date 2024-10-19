@@ -6,18 +6,18 @@ import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import tensorflow as tf
-
+import zipfile
 # Load your pre-trained model
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-zip_file_path = 'creditcard.zip'
 
-# Open the zip file
-'''with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-    csv_filename = 'creditcard.csv'
+zip_file_path = 'creditcard.zip'  # Path to your ZIP file
+csv_filename = 'creditcard.csv'  # The CSV file inside the ZIP archive
 
-    with zip_ref.open(csv_filename) as csv_file:
-        data = pd.read_csv(csv_file)'''
+# Step 2: Open the ZIP file and read the CSV file into pandas
+with zipfile.ZipFile(zip_file_path) as z:
+    with z.open(csv_filename) as f:
+        data = pd.read_csv(f)
 
 # Prepare test data
 X_test = data.drop('Class', axis=1).values  # Features
