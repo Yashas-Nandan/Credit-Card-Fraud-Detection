@@ -86,15 +86,25 @@ if section == "Model Overview":
     plt.title('Distribution of Fraud vs Non-Fraud Transactions')
     st.pyplot()
 
-    # Display the indices where fraud appears
+
+
+
+
+
+
+
+
+# Adversarial Attacks Section
+elif section == "Adversarial Attacks":
+    st.header("Adversarial Attacks")
+
+
+        # Display the indices where fraud appears
     if len(fraud_indices) > 0:
         st.write("Fraud Indices in Test Set:", fraud_indices)
     else:
         st.write("No fraud cases in the test set.")
 
-# Adversarial Attacks Section
-elif section == "Adversarial Attacks":
-    st.header("Adversarial Attacks")
     
     # Before vs. After Attack Comparison
     st.subheader("Before vs. After Attack")
@@ -128,6 +138,10 @@ elif section == "Adversarial Attacks":
     else:
         st.info("The adversarial transaction is classified as Not Fraud.")
 
+
+
+
+
 # Explainability Section
 elif section == "Explainability":
     st.header("Explainability with SHAP")
@@ -144,6 +158,10 @@ elif section == "Explainability":
     st.write(f"Transaction: {X_test[idx]}")
     shap.force_plot(explainer.expected_value, shap_values[idx], X_test[idx], matplotlib=True)
     st.pyplot()
+
+
+
+
 
 # Interactive Prediction Tool Section
 elif section == "Interactive Prediction Tool":
