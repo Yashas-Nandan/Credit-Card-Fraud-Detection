@@ -3,12 +3,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import shap
 from imblearn.over_sampling import SMOTE
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 import tensorflow as tf
 from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
 
 # Load dataset
 data = pd.read_csv('creditcard.csv')  # Adjust with your dataset path
@@ -37,7 +38,7 @@ y_test_class_1 = y_class_1[n_class_1_train:]
 
 # For class 0, take a proportionate split of the remaining data
 X_train_class_0, X_test_class_0, y_train_class_0, y_test_class_0 = train_test_split(
-    X_class_0, y_class_0, test_size=n_class_1_test, random_state=42, stratify=y_class_0)
+X_class_0, y_class_0, test_size=n_class_1_test, random_state=42, stratify=y_class_0)
 
 # Combine the classes back into a single dataset
 X_train = np.vstack((X_train_class_0, X_train_class_1))
@@ -62,11 +63,24 @@ def build_model():
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
-# Build and train the model
-model = build_model()
+# Create a pipeline
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('model', build_model())
+])
 
-# Class weights to handle imbalance
-class_weight = {0: 1, 1: 5}  # Give more weight to fraud cases
+# Hyperparameter tuning
+param_grid = {
+    'model__dropout_rate': [0.3, 0.5, 0.7],
+    'model__neurons': [64, 128, 256]
+}
+
+# Use GridSearchCV or RandomizedSearchCV to find the best hyperparameters
+grid_search = GridSearchCV(pipeline, param_grid, scoring='f1', cv=3, n_jobs=-1)
+grid_search.fit(X_train_resampled, y_train_resampled)
+
+# Best model
+best_model = grid_search.best_estimator_
 
 # Adversarial training: Generate adversarial examples and include them in the training set
 def generate_adversarial_examples(X, epsilon=0.1):
@@ -82,7 +96,7 @@ X_combined = np.vstack((X_train_resampled, X_adv))
 y_combined = np.concatenate((y_train_resampled, y_train_resampled))  # Duplicate the labels
 
 # Train the model with the combined dataset
-history = model.fit(X_combined, y_combined, epochs=3, batch_size=32, class_weight=class_weight, validation_split=0.2)
+history = best_model.fit(X_combined, y_combined, epochs=10, batch_size=32, validation_split=0.2)
 
 # Function to calculate model performance
 def get_model_performance(model, X, y, threshold=0.5):
@@ -96,11 +110,7 @@ def get_model_performance(model, X, y, threshold=0.5):
 
 # Generate adversarial examples for testing
 X_adv_test = generate_adversarial_examples(X_test, epsilon=0.1)
-# Normalize adversarial examples to match the training data
-X_adv_test = scaler.transform(X_adv_test)
-
-# Create a SHAP explainer
-explainer = shap.KernelExplainer(model.predict, X_train_resampled[:100])  # Limit to 100 samples for faster SHAP calculations
+  # Limit to 100 samples for faster SHAP calculations
 
 # Main Streamlit app
 st.title("Fraud Detection Model Dashboard")
@@ -114,7 +124,7 @@ if section == "Model Overview":
     st.header("Model Overview")
     
     # Performance metrics on clean test data
-    clean_accuracy, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(model, X_test, y_test, threshold=0.5)
+    clean_accuracy, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(best_model, X_test, y_test, threshold=0.5)
     st.subheader("Performance on Clean Data")
     st.write(f"Accuracy: {clean_accuracy:.4f}")
     st.write(f"Precision: {clean_precision:.4f}")
@@ -122,7 +132,7 @@ if section == "Model Overview":
     st.write(f"F1-Score: {clean_f1:.4f}")
 
     # Performance metrics on adversarial test data
-    adv_accuracy, adv_precision, adv_recall, adv_f1, y_pred_adv = get_model_performance(model, X_adv_test, y_test, threshold=0.5)
+    adv_accuracy, adv_precision, adv_recall, adv_f1, y_pred_adv = get_model_performance(best_model, X_adv_test, y_test, threshold=0.5)
     st.subheader("Performance on Adversarial Data")
     st.write(f"Accuracy: {adv_accuracy:.4f}")
     st.write(f"Precision: {adv_precision:.4f}")
@@ -163,40 +173,19 @@ elif section == "Adversarial Attacks":
     st.subheader("Adversarial Example")
     idx = st.slider("Select Transaction Index", 0, len(X_adv)-1)
     st.write(f"Original Transaction: {X_test[idx]}")
-    st.write(f"Adversarial Transaction: {X_adv[idx]}")
-    
-    # Reshape input for prediction
-    original_input = X_test[idx:idx+1]  # Ensure correct shape for model input
-    adversarial_input = X_adv[idx:idx+1]  # Ensure correct shape for model input
-    
-    # Get predictions
-    original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
-    adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
-    
-    # Indicate if the original prediction is fraud
-    if original_pred == 1:
-        st.success("The original transaction is classified as Fraud.")
-    else:
-        st.warning("The original transaction is classified as Not Fraud.")
-
-    # Indicate if the adversarial prediction is fraud
-    if adv_pred == 1:
-        st.error("The adversarial transaction is classified as Fraud.")
-    else:
-        st.info("The adversarial transaction is classified as Not Fraud.")
-
+    st.write(f"Adversarial Transaction: {X_adv_test[idx]}")
 
 # Explainability Section
 elif section == "Explainability":
     st.header("Explainability with Seaborn")
-    
+
     # Calculate feature importances using basic correlations
     st.subheader("Feature Importance Plot (Correlation with Target)")
     feature_importance = pd.DataFrame({
         'Feature': data.columns[:-1],
         'Importance': np.abs(np.corrcoef(X_train_resampled.T, y_train_resampled)[-1, :-1])  # Absolute correlation between features and target
     }).sort_values(by='Importance', ascending=False)
-    
+
     # Plot feature importance
     plt.figure(figsize=(10, 6))
     sns.barplot(x='Importance', y='Feature', data=feature_importance)
@@ -207,26 +196,25 @@ elif section == "Explainability":
     st.subheader("Per-Transaction Feature Values")
     idx = st.slider("Select Transaction Index", 0, len(X_test) - 1)
     selected_transaction = pd.DataFrame(X_test[idx], index=data.columns[:-1], columns=["Feature Value"])
-    
+
     st.write(f"Transaction {idx}: Feature Values")
     st.dataframe(selected_transaction.T)
-
-
 # Interactive Prediction Tool Section
 elif section == "Interactive Prediction Tool":
     st.header("Interactive Prediction Tool")
     
-    # Input features for a new transaction
+    # User input for transaction features
     st.subheader("Input Transaction Features")
-    transaction_input = []
-    for i in range(X_test.shape[1]):
-        feature_val = st.number_input(f"Feature {i+1}", value=float(X_test[0, i]))
-        transaction_input.append(feature_val)
+    input_features = []
+    for feature in data.columns[:-1]:
+        input_value = st.number_input(feature, value=0.0)
+        input_features.append(input_value)
     
-    # Predict fraud/not fraud
-    transaction_input = np.array(transaction_input).reshape(1, -1)
-    transaction_input_scaled = scaler.transform(transaction_input)  # Scale the input
-    pred_prob = model.predict(transaction_input_scaled)[0][0]
-    pred_label = "Fraud" if pred_prob > 0.5 else "Not Fraud"
+    input_features = np.array(input_features).reshape(1, -1)
+    input_features_scaled = scaler.transform(input_features)  # Scale input
     
-    st.write(f"Prediction: {pred_label}")
+    # Prediction
+    if st.button("Predict"):
+        prediction = best_model.predict(input_features_scaled)
+        st.write("Fraud Prediction (1=Fraud, 0=Not Fraud):", int(prediction[0][0] > 0.5))
+
