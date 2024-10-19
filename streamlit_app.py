@@ -45,12 +45,18 @@ clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model
 # Create a SHAP explainer
 explainer = shap.Explainer(model, X_train)
 
+# Function to find fraudulent transactions
+def find_fraud_transactions(model, X):
+    y_pred = (model.predict(X) > 0.5).astype(int)  # Get predictions
+    fraud_indices = np.where(y_pred.flatten() == 1)[0]  # Indices where prediction is fraud
+    return fraud_indices
+
 # Main app
 st.title("Fraud Detection Model Dashboard")
 
 # Sidebar for navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["Model Overview", "Adversarial Attacks", "Explainability", "Interactive Prediction Tool"])
+section = st.sidebar.radio("Go to", ["Model Overview", "Adversarial Attacks", "Explainability", "Interactive Prediction Tool", "Find Fraud Transactions"])
 
 # Model Overview Section
 if section == "Model Overview":
@@ -101,6 +107,10 @@ elif section == "Adversarial Attacks":
     # Get predictions
     original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
     adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
+
+    # Display predictions
+    st.write(f"Original Prediction: {'Fraud' if original_pred == 1 else 'Not Fraud'}")
+    st.write(f"Adversarial Prediction: {'Fraud' if adv_pred == 1 else 'Not Fraud'}")
     
     # Indicate if the original prediction is fraud
     if original_pred == 1:
@@ -152,3 +162,17 @@ elif section == "Interactive Prediction Tool":
     shap_values_input = explainer(transaction_input)
     shap.force_plot(explainer.expected_value, shap_values_input, transaction_input, matplotlib=True)
     st.pyplot()
+
+# Find Fraud Transactions Section
+elif section == "Find Fraud Transactions":
+    st.header("Find Fraud Transactions")
+    
+    # Find fraudulent transactions
+    fraud_indices = find_fraud_transactions(model, X_test)
+    
+    # Display results
+    if len(fraud_indices) > 0:
+        st.success(f"Found {len(fraud_indices)} fraudulent transactions!")
+        st.write("Fraudulent Transaction Indices:", fraud_indices.tolist())
+    else:
+        st.warning("No fraudulent transactions found in the test set.")
