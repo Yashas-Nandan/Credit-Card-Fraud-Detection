@@ -21,10 +21,37 @@ with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
     with zip_ref.open(csv_filename) as csv_file:
         data = pd.read_csv(csv_file)
         st.write(data)
+def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
+    # Ensure the model is in evaluation mode
+    model.eval()
 
+    # Convert inputs to a tensor
+    X_test_tensor = tf.convert_to_tensor(X_test, dtype=tf.float32)
+    y_test_tensor = tf.convert_to_tensor(y_test, dtype=tf.float32)
+
+    # Create a gradient tape to record operations
+    with tf.GradientTape() as tape:
+        # Make predictions on the test set
+        tape.watch(X_test_tensor)
+        predictions = model(X_test_tensor)
+        loss = tf.keras.losses.binary_crossentropy(y_test_tensor, predictions)
+    
+    # Calculate gradients of the loss with respect to the input
+    gradients = tape.gradient(loss, X_test_tensor)
+
+    # Generate adversarial examples by adding perturbations to the original input
+    X_adv = X_test + epsilon * tf.sign(gradients)
+
+    # Clip the values to ensure they remain within the valid range
+    X_adv = tf.clip_by_value(X_adv, 0, 1)  # Assuming inputs are normalized to [0, 1]
+
+    return X_adv.numpy(), y_test  # Return as numpy arrays
+
+# Example usage
+X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
 X_test = data.drop('Class', axis=1).values
 y_test = data['Class'].values
-X_adv, y_adv = tf.generate_adversarial_examples(model, X_test, y_test)
+X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
 # Function to calculate model performance
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
