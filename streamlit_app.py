@@ -7,17 +7,19 @@ import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import tensorflow as tf
 
-
 # Load or train your model here
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-
+# Load the dataset
 data = pd.read_csv('creditcard.csv')
 st.write(data)
 
 # Load the features and labels
 X_test = data.drop('Class', axis=1).values
 y_test = data['Class'].values
+
+# Check the dimensions of the dataset
+st.write(f"Data dimensions: {X_test.shape}, Labels dimensions: {y_test.shape}")
 
 # Generate adversarial examples (as before)
 def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
@@ -27,7 +29,6 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
 
     # Create a gradient tape to record operations
     with tf.GradientTape() as tape:
-        # Make predictions on the test set
         tape.watch(X_test_tensor)
         predictions = model(X_test_tensor)
         loss = tf.keras.losses.binary_crossentropy(y_test_tensor, predictions)
@@ -43,13 +44,12 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
 
     return X_adv.numpy(), y_test  # Return as numpy arrays
 
-
 # Function to calculate model performance
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
 
-    # Reshape the predictions array to match the shape of y (from (75000, 1) to (75000,))
-    y_pred = y_pred.reshape(-1)  # Flatten the array to shape (75000,)
+    # Reshape the predictions array to match the shape of y (from (49000, 1) to (49000,))
+    y_pred = y_pred.reshape(-1)  # Flatten the array to shape (49000,)
 
     # For binary classification, convert probabilities to 0 or 1 predictions
     y_pred = (y_pred > 0.5).astype(int)
@@ -60,7 +60,6 @@ def get_model_performance(model, X, y):
     f1 = f1_score(y, y_pred)
     
     return acc, precision, recall, f1
-
 
 # Example usage: generate adversarial examples
 X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
@@ -126,6 +125,7 @@ elif section == "Explainability":
     
     # Feature importance plot
     st.subheader("Feature Importance Plot (SHAP)")
+    explainer = shap.KernelExplainer(model.predict, X_test)  # Make sure to define the explainer
     shap_values = explainer.shap_values(X_test)
     shap.summary_plot(shap_values, X_test, show=False)
     st.pyplot()
