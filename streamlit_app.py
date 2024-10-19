@@ -115,6 +115,10 @@ if section == "Model Overview":
     
     # Performance metrics on clean test data
     clean_acc, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(model, X_test, y_test, threshold=0.5)
+    
+    # Store clean accuracy in session state
+    st.session_state.clean_acc = clean_acc
+
     st.subheader("Performance on Clean Data")
     st.write(f"Accuracy: {clean_acc:.4f}")
     st.write(f"Precision: {clean_precision:.4f}")
@@ -154,10 +158,10 @@ if section == "Model Overview":
 elif section == "Adversarial Attacks":
     st.header("Adversarial Attacks")
     
-    # Ensure clean_acc is defined
-    if 'clean_acc' in locals():
+    # Ensure clean_acc is defined in session state
+    if 'clean_acc' in st.session_state:
         st.subheader("Before vs. After Attack")
-        st.write("Model accuracy before attack: ", clean_acc)
+        st.write("Model accuracy before attack: ", st.session_state.clean_acc)
         
         # Calculate adversarial performance
         adv_acc, adv_precision, adv_recall, adv_f1, y_pred_adv = get_model_performance(model, X_adv_test, y_test, threshold=0.5)
@@ -165,17 +169,14 @@ elif section == "Adversarial Attacks":
         
         # Generate adversarial example
         st.subheader("Adversarial Example")
-        idx = st.slider("Select Transaction Index", 0, len(X_adv_test)-1)
-        st.write(f"Original Transaction: {X_test[idx]}")
-        st.write(f"Adversarial Transaction: {X_adv_test[idx]}")
+        idx = st.slider("Select Transaction Index for Adversarial Example", 0, len(X_test) - 1)
         
-        # Reshape input for prediction
-        original_input = X_test[idx:idx+1]  # Ensure correct shape for model input
-        adversarial_input = X_adv_test[idx:idx+1]  # Ensure correct shape for model input
+        # Display original vs adversarial predictions
+        original_input = X_test[idx].reshape(1, -1)
+        original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Original prediction
         
-        # Get predictions
-        original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
-        adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
+        adversarial_input = X_adv_test[idx].reshape(1, -1)  # Adversarial input
+        adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Adversarial prediction
         
         # Indicate if the original prediction is fraud
         if original_pred == 1:
