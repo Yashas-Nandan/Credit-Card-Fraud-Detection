@@ -101,10 +101,6 @@ elif section == "Adversarial Attacks":
     # Get predictions
     original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
     adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
-
-    # Display predictions
-    st.write(f"Original Prediction: {'Fraud' if original_pred == 1 else 'Not Fraud'}")
-    st.write(f"Adversarial Prediction: {'Fraud' if adv_pred == 1 else 'Not Fraud'}")
     
     # Indicate if the original prediction is fraud
     if original_pred == 1:
