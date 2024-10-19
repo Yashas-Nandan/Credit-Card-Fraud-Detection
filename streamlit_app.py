@@ -6,6 +6,7 @@ import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE  # Import SMOTE
 import tensorflow as tf
 
 # Load your trained model
@@ -17,7 +18,11 @@ X = data.iloc[:, :-1].values  # Features
 y = data.iloc[:, -1].values  # Target labels
 
 # Split dataset into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.6, random_state=0, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# Apply SMOTE to the training set
+smote = SMOTE(random_state=42)
+X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
 # Function to create adversarial examples
 def generate_adversarial_examples(X, epsilon=0.1):
@@ -43,20 +48,14 @@ def get_model_performance(model, X, y):
 clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
 
 # Create a SHAP explainer
-explainer = shap.Explainer(model, X_train)
-
-# Function to find fraudulent transactions
-def find_fraud_transactions(model, X):
-    y_pred = (model.predict(X) > 0.5).astype(int)  # Get predictions
-    fraud_indices = np.where(y_pred.flatten() == 1)[0]  # Indices where prediction is fraud
-    return fraud_indices
+explainer = shap.Explainer(model, X_train_resampled)
 
 # Main app
 st.title("Fraud Detection Model Dashboard")
 
 # Sidebar for navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["Model Overview", "Adversarial Attacks", "Explainability", "Interactive Prediction Tool", "Find Fraud Transactions"])
+section = st.sidebar.radio("Go to", ["Model Overview", "Adversarial Attacks", "Explainability", "Interactive Prediction Tool"])
 
 # Model Overview Section
 if section == "Model Overview":
@@ -107,10 +106,6 @@ elif section == "Adversarial Attacks":
     # Get predictions
     original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
     adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
-
-    # Display predictions
-    st.write(f"Original Prediction: {'Fraud' if original_pred == 1 else 'Not Fraud'}")
-    st.write(f"Adversarial Prediction: {'Fraud' if adv_pred == 1 else 'Not Fraud'}")
     
     # Indicate if the original prediction is fraud
     if original_pred == 1:
@@ -162,17 +157,3 @@ elif section == "Interactive Prediction Tool":
     shap_values_input = explainer(transaction_input)
     shap.force_plot(explainer.expected_value, shap_values_input, transaction_input, matplotlib=True)
     st.pyplot()
-
-# Find Fraud Transactions Section
-elif section == "Find Fraud Transactions":
-    st.header("Find Fraud Transactions")
-    
-    # Find fraudulent transactions
-    fraud_indices = find_fraud_transactions(model, X_test)
-    
-    # Display results
-    if len(fraud_indices) == 1:
-        st.success(f"Found {len(fraud_indices)} fraudulent transactions!")
-        st.write("Fraudulent Transaction Indices:", fraud_indices.tolist())
-    else:
-        st.warning("No fraudulent transactions found in the test set.")
