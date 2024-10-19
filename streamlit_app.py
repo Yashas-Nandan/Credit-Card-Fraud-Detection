@@ -31,12 +31,21 @@ non_fraud_cases_test = non_fraud_cases.sample(n=len(non_fraud_cases) - 1, random
 X_test = np.vstack((test_fraud_case.iloc[:, :-1].values, non_fraud_cases_test.iloc[:, :-1].values))
 y_test = np.hstack((test_fraud_case.iloc[:, -1].values, non_fraud_cases_test.iloc[:, -1].values))
 
-# Prepare training data using all other non-fraud cases
+# Prepare training data using the remaining fraud cases and all the non-fraud cases
 remaining_non_fraud_cases = non_fraud_cases.drop(non_fraud_cases_test.index)
 
-# Now create the training set with the remaining non-fraud cases
-X_train = remaining_non_fraud_cases.iloc[:, :-1].values
-y_train = remaining_non_fraud_cases.iloc[:, -1].values
+# Ensure that we include more than just one fraud case for training
+if len(fraud_cases) > 1:
+    additional_fraud_cases = fraud_cases.drop(test_fraud_case.index)  # Drop the test case from fraud cases
+    # Sample a reasonable amount of additional fraud cases to include
+    num_additional_fraud_cases = min(5, len(additional_fraud_cases))  # Adjust as needed
+    sampled_fraud_cases = additional_fraud_cases.sample(n=num_additional_fraud_cases, random_state=42)
+else:
+    sampled_fraud_cases = pd.DataFrame()  # No additional fraud cases to sample
+
+# Combine the remaining non-fraud cases with the sampled fraud cases
+X_train = np.vstack((remaining_non_fraud_cases.iloc[:, :-1].values, sampled_fraud_cases.iloc[:, :-1].values))
+y_train = np.hstack((remaining_non_fraud_cases.iloc[:, -1].values, sampled_fraud_cases.iloc[:, -1].values))
 
 # Apply SMOTE to the training set
 smote = SMOTE(random_state=42)
