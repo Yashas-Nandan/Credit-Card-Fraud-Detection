@@ -7,7 +7,6 @@ import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # Load or train your model here
-model = load_model('fraud_detection_model.h5')
 
 import tensorflow as tf
 
