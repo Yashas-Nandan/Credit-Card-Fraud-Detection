@@ -10,8 +10,8 @@ import tensorflow as tf
 # Load or train your model here
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-# Load the dataset
-data = pd.read_csv('creditcard.csv')
+# Load dataset (replace with the uploaded file path)
+data = pd.read_csv('/mnt/data/creditcard2.csv')
 st.write(data)
 
 # Load the features and labels
@@ -42,12 +42,13 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
 
     return X_adv.numpy(), y_test  # Return as numpy arrays
 
+
 # Function to calculate model performance
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
 
-    # Reshape the predictions array (from (75000, 1) to (75000,))
-    y_pred = y_pred.reshape(-1)  # Reshape to flatten the array
+    # Flatten the predictions array to match the shape of the target (n_samples,)
+    y_pred = y_pred.ravel()
 
     # For binary classification, convert probabilities to 0 or 1 predictions
     y_pred = (y_pred > 0.5).astype(int)
@@ -58,6 +59,7 @@ def get_model_performance(model, X, y):
     f1 = f1_score(y, y_pred)
     
     return acc, precision, recall, f1
+
 
 # Example usage: generate adversarial examples
 X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
@@ -111,9 +113,9 @@ elif section == "Adversarial Attacks":
     st.write(f"Original Transaction: {X_test[idx]}")
     st.write(f"Adversarial Transaction: {X_adv[idx]}")
     
-    # Keep input shape consistent for prediction
-    original_pred = model.predict(X_test[idx:idx+1])[0]  # Use a slice to maintain shape
-    adv_pred = model.predict(X_adv[idx:idx+1])[0]  # Use a slice to maintain shape
+    # Flatten predictions for both original and adversarial transactions
+    original_pred = model.predict([X_test[idx]]).ravel()[0]
+    adv_pred = model.predict([X_adv[idx]]).ravel()[0]
     
     st.write(f"Original Prediction: {'Fraud' if original_pred > 0.5 else 'Not Fraud'}")
     st.write(f"Adversarial Prediction: {'Fraud' if adv_pred > 0.5 else 'Not Fraud'}")
@@ -124,7 +126,7 @@ elif section == "Explainability":
     
     # Feature importance plot
     st.subheader("Feature Importance Plot (SHAP)")
-    explainer = shap.KernelExplainer(model.predict, X_test)  # Make sure to define the explainer
+    explainer = shap.KernelExplainer(model.predict, X_test)
     shap_values = explainer.shap_values(X_test)
     shap.summary_plot(shap_values, X_test, show=False)
     st.pyplot()
@@ -149,7 +151,7 @@ elif section == "Interactive Prediction Tool":
     
     # Predict fraud/not fraud
     transaction_input = np.array(transaction_input).reshape(1, -1)
-    pred = model.predict(transaction_input)[0]
+    pred = model.predict(transaction_input).ravel()[0]
     st.write(f"Prediction: {'Fraud' if pred > 0.5 else 'Not Fraud'}")
     
     # Show SHAP explanations for the prediction
