@@ -93,6 +93,8 @@ def get_model_performance(model, X, y, threshold=0.5):
     recall = recall_score(y, y_pred, zero_division=0)  # Handle zero division
     f1 = f1_score(y, y_pred, zero_division=0)  # Handle zero division
     return acc, precision, recall, f1, y_pred
+    
+clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
 
 # Generate adversarial examples for testing
 X_adv_test = generate_adversarial_examples(X_test, epsilon=0.1)
