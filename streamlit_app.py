@@ -80,6 +80,9 @@ def get_model_performance(model, X, y, threshold=0.5):
     f1 = f1_score(y, y_pred)
     return acc, precision, recall, f1, y_pred
 
+# Calculate performance on clean test data
+clean_acc, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(model, X_test, y_test, threshold=0.3)  # Adjusted threshold
+
 # Create a SHAP explainer
 explainer = shap.KernelExplainer(model.predict, X_train[:100])  # Limit to 100 samples for faster SHAP calculations
 
@@ -95,7 +98,6 @@ if section == "Model Overview":
     st.header("Model Overview")
     
     # Performance metrics on clean test data
-    clean_acc, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(model, X_test, y_test, threshold=0.3)  # Adjusted threshold
     st.subheader("Performance on Clean Data")
     st.write(f"Accuracy: {clean_acc:.4f}")
     st.write(f"Precision: {clean_precision:.4f}")
@@ -119,6 +121,11 @@ if section == "Model Overview":
 elif section == "Adversarial Attacks":
     st.header("Adversarial Attacks")
     
+    # Ensure X_adv and y_adv are defined; example dummy values
+    # You need to replace this with your actual method to generate adversarial examples
+    X_adv = X_test.copy()  # Replace with your method to generate adversarial examples
+    y_adv = y_test.copy()  # Replace with the true labels for the adversarial examples
+
     # Before vs. After Attack Comparison
     st.subheader("Before vs. After Attack")
     st.write("Model accuracy before attack: ", clean_acc)
@@ -168,24 +175,3 @@ elif section == "Explainability":
     shap.force_plot(explainer.expected_value, shap_values[idx], X_test[idx], matplotlib=True)
     st.pyplot()
 
-# Interactive Prediction Tool Section
-elif section == "Interactive Prediction Tool":
-    st.header("Interactive Prediction Tool")
-    
-    # Input features for a new transaction
-    st.subheader("Input Transaction Features")
-    transaction_input = []
-    for i in range(X_test.shape[1]):
-        feature_val = st.number_input(f"Feature {i+1}", value=float(X_test[0, i]))
-        transaction_input.append(feature_val)
-    
-    # Predict fraud/not fraud
-    transaction_input = np.array(transaction_input).reshape(1, -1)
-    pred = (model.predict(transaction_input) > 0.3).astype(int)[0][0]  # Adjusted threshold for prediction
-    st.write(f"Prediction: {'Fraud' if pred == 1 else 'Not Fraud'}")
-    
-    # Show SHAP explanations for the prediction
-    st.subheader("Explanation for the Prediction")
-    shap_values_input = explainer.shap_values(transaction_input)
-    shap.force_plot(explainer.expected_value, shap_values_input[0], transaction_input, matplotlib=True)
-    st.pyplot()
