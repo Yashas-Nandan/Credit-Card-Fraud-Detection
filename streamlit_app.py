@@ -47,10 +47,10 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
 # Function to calculate model performance
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
-    
-    # Reshape predictions to match the shape of `y`
-    y_pred = np.squeeze(y_pred)  # Convert from (75000, 1) to (75000,)
-    
+
+    # Reshape the predictions array (from (75000, 1) to (75000,))
+    y_pred = y_pred.ravel()  # Use .ravel() to flatten the array
+
     # For binary classification, convert probabilities to 0 or 1 predictions
     y_pred = (y_pred > 0.5).astype(int)
 
