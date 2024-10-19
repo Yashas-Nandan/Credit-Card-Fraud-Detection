@@ -25,24 +25,23 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
     X_test_tensor = tf.convert_to_tensor(X_test, dtype=tf.float32)
     y_test_tensor = tf.convert_to_tensor(y_test, dtype=tf.float32)
 
+    # Create a gradient tape to record operations
     with tf.GradientTape() as tape:
+        # Make predictions on the test set
         tape.watch(X_test_tensor)
         predictions = model(X_test_tensor)
-
-        # Ensure predictions are shaped correctly
-        if len(predictions.shape) == 1:  # If predictions are (n_samples,)
-            predictions = tf.expand_dims(predictions, axis=-1)  # Shape (n_samples, 1)
-        
         loss = tf.keras.losses.binary_crossentropy(y_test_tensor, predictions)
-
-    # Calculate gradients
+    
+    # Calculate gradients of the loss with respect to the input
     gradients = tape.gradient(loss, X_test_tensor)
+
+    # Generate adversarial examples by adding perturbations to the original input
     X_adv = X_test + epsilon * tf.sign(gradients)
 
-    # Clip values to ensure they remain in the valid range
-    X_adv = tf.clip_by_value(X_adv, 0, 1)
+    # Clip the values to ensure they remain within the valid range
+    X_adv = tf.clip_by_value(X_adv, 0, 1)  # Assuming inputs are normalized to [0, 1]
 
-    return X_adv.numpy(), y_test 
+    return X_adv.numpy(), y_test  # Return as numpy arrays
 
 
 # Function to calculate model performance
@@ -50,7 +49,7 @@ def get_model_performance(model, X, y):
     y_pred = model.predict(X)
 
     # Reshape the predictions array to match the shape of y (from (75000, 1) to (75000,))
-    y_pred = y_pred.reshape(-1)  # Use .reshape(-1) to flatten the array
+    y_pred = y_pred.reshape(-1,1)  # Use .reshape(-1) to flatten the array
 
     # For binary classification, convert probabilities to 0 or 1 predictions
     y_pred = (y_pred > 0.5).astype(int)
