@@ -24,7 +24,7 @@ with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
 
 X_test = data.drop('Class', axis=1).values
 y_test = data['Class'].values
-
+X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
 # Function to calculate model performance
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
