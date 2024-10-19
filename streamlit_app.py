@@ -145,26 +145,28 @@ elif section == "Adversarial Attacks":
 
 # Explainability Section
 elif section == "Explainability":
-    st.header("Explainability with SHAP")
+    st.header("Explainability with Seaborn")
     
-    # Create a SHAP explainer
-    explainer = shap.KernelExplainer(model.predict, X_train_resampled[:100])  # Limit to 100 samples for faster SHAP calculations
+    # Calculate feature importances using basic correlations
+    st.subheader("Feature Importance Plot (Correlation with Target)")
+    feature_importance = pd.DataFrame({
+        'Feature': data.columns[:-1],
+        'Importance': np.abs(np.corrcoef(X_train_resampled.T, y_train_resampled)[-1, :-1])  # Absolute correlation between features and target
+    }).sort_values(by='Importance', ascending=False)
     
-    # Feature Importance Plot (SHAP Summary Plot)
-    st.subheader("Feature Importance Plot (SHAP)")
-    shap_values = explainer.shap_values(X_test[:100])  # Limit X_test for faster visualization
-    shap.summary_plot(shap_values, X_test[:100], feature_names=data.columns[:-1], show=False)
+    # Plot feature importance
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x='Importance', y='Feature', data=feature_importance)
+    plt.title("Feature Importance Based on Correlation with Target")
     st.pyplot()
 
-    # Per-Transaction Explanation
-    st.subheader("Per-Transaction Explanation")
+    # Per-Transaction Explanation: Show feature values for a selected transaction
+    st.subheader("Per-Transaction Feature Values")
     idx = st.slider("Select Transaction Index", 0, len(X_test) - 1)
-    st.write(f"Transaction: {X_test[idx]}")
+    selected_transaction = pd.DataFrame(X_test[idx], index=data.columns[:-1], columns=["Feature Value"])
     
-    # SHAP values for the selected transaction
-    shap_value_single = explainer.shap_values(X_test[idx:idx + 1])
-    shap.force_plot(explainer.expected_value, shap_value_single, X_test[idx], matplotlib=True)
-    st.pyplot()
+    st.write(f"Transaction {idx}: Feature Values")
+    st.dataframe(selected_transaction.T)
 
 # Interactive Prediction Tool Section
 elif section == "Interactive Prediction Tool":
