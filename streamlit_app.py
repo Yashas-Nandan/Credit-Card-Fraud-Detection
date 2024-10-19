@@ -5,23 +5,24 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
-# Load or train your model here
-
+import zipfile
 import tensorflow as tf
 
-# Load the pre-trained model
+
+# Load or train your model here
 model = tf.keras.models.load_model('fraud_detection_model.h5')
-import pandas as pd
-import numpy as np
 
-# Load your credit card dataset
-# Replace 'credit_card_data.csv' with the path to your dataset
-data = pd.read_csv('creditcard.csv')
+zip_file_path = 'creditcard.zip'
 
-# Assume 'features' are in the columns except the label column
-# and 'label' is the target variable
-X_test = data.drop('Class', axis=1).values  # Features
+# Open the zip file
+with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+    csv_filename = 'creditcard.csv'
+
+    with zip_ref.open(csv_filename) as csv_file:
+        data = pd.read_csv(csv_file)
+        st.write(data)
+
+X_test = data.drop('Class', axis=1).values
 y_test = data['Class'].values
 
 # Function to calculate model performance
