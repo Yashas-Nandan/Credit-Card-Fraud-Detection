@@ -150,6 +150,7 @@ if section == "Model Overview":
 
 # Adversarial Attacks Section
 elif section == "Adversarial Attacks":
+    clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
     st.header("Adversarial Attacks")
     
     # Before vs. After Attack Comparison
