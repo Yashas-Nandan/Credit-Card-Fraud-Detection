@@ -13,11 +13,11 @@ model = tf.keras.models.load_model('fraud_detection_model.h5')
 zip_file_path = 'creditcard.zip'
 
 # Open the zip file
-with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+'''with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
     csv_filename = 'creditcard.csv'
 
     with zip_ref.open(csv_filename) as csv_file:
-        data = pd.read_csv(csv_file)
+        data = pd.read_csv(csv_file)'''
 
 # Prepare test data
 X_test = data.drop('Class', axis=1).values  # Features
