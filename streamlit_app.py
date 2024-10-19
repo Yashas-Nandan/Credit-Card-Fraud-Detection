@@ -158,7 +158,7 @@ if section == "Model Overview":
 elif section == "Adversarial Attacks":
     st.header("Adversarial Attacks")
     
-    # Ensure clean_acc is defined in session state
+    # Check if clean_acc is defined in session state
     if 'clean_acc' in st.session_state:
         st.subheader("Before vs. After Attack")
         st.write("Model accuracy before attack: ", st.session_state.clean_acc)
