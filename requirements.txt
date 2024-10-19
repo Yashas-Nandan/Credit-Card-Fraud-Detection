@@ -6,3 +6,4 @@ seaborn
 shap
 scikit-learn
 tensorflow
+zipfile
