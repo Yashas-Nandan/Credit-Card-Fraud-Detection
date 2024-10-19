@@ -14,10 +14,13 @@ model = tf.keras.models.load_model('fraud_detection_model.h5')
 
 data = pd.read_csv('creditcard.csv')
 st.write(data)
-def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
-    # Ensure the model is in evaluation mode
-    model.eval()
 
+# Load the features and labels
+X_test = data.drop('Class', axis=1).values
+y_test = data['Class'].values
+
+# Generate adversarial examples (as before)
+def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
     # Convert inputs to a tensor
     X_test_tensor = tf.convert_to_tensor(X_test, dtype=tf.float32)
     y_test_tensor = tf.convert_to_tensor(y_test, dtype=tf.float32)
@@ -40,23 +43,27 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
 
     return X_adv.numpy(), y_test  # Return as numpy arrays
 
-# Example usage
-X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
-X_test = data.drop('Class', axis=1).values
-y_test = data['Class'].values
-X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
+
 # Function to calculate model performance
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
+    
+    # Reshape predictions to match the shape of `y`
+    y_pred = np.squeeze(y_pred)  # Convert from (75000, 1) to (75000,)
+    
+    # For binary classification, convert probabilities to 0 or 1 predictions
+    y_pred = (y_pred > 0.5).astype(int)
+
     acc = accuracy_score(y, y_pred)
     precision = precision_score(y, y_pred)
     recall = recall_score(y, y_pred)
     f1 = f1_score(y, y_pred)
+    
     return acc, precision, recall, f1
 
-# Load SHAP explainer
-# Assume explainer is built for your model
-# explainer = shap.Explainer(model, X_train)
+
+# Example usage: generate adversarial examples
+X_adv, y_adv = generate_adversarial_examples(model, X_test, y_test)
 
 # Main app
 st.title("Fraud Detection Model Dashboard")
@@ -108,8 +115,8 @@ elif section == "Adversarial Attacks":
     st.write(f"Adversarial Transaction: {X_adv[idx]}")
     original_pred = model.predict([X_test[idx]])[0]
     adv_pred = model.predict([X_adv[idx]])[0]
-    st.write(f"Original Prediction: {'Fraud' if original_pred == 1 else 'Not Fraud'}")
-    st.write(f"Adversarial Prediction: {'Fraud' if adv_pred == 1 else 'Not Fraud'}")
+    st.write(f"Original Prediction: {'Fraud' if original_pred > 0.5 else 'Not Fraud'}")
+    st.write(f"Adversarial Prediction: {'Fraud' if adv_pred > 0.5 else 'Not Fraud'}")
 
 # Explainability Section
 elif section == "Explainability":
@@ -142,10 +149,9 @@ elif section == "Interactive Prediction Tool":
     # Predict fraud/not fraud
     transaction_input = np.array(transaction_input).reshape(1, -1)
     pred = model.predict(transaction_input)[0]
-    st.write(f"Prediction: {'Fraud' if pred == 1 else 'Not Fraud'}")
+    st.write(f"Prediction: {'Fraud' if pred > 0.5 else 'Not Fraud'}")
     
     # Show SHAP explanations for the prediction
-    st.subheader("Explanation for the Prediction")
     shap_values_input = explainer.shap_values(transaction_input)
     shap.force_plot(explainer.expected_value[1], shap_values_input[1], transaction_input, matplotlib=True)
     st.pyplot()
