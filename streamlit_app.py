@@ -11,9 +11,9 @@ import tensorflow as tf
 # Load or train your model here
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-with st.expander('Data'):
-    data = pd.read_csv('creditcard.csv')
-    st.write(data)
+
+data = pd.read_csv('creditcard.csv')
+st.write(data)
 
 # Load the features and labels
 X_test = data.drop('Class', axis=1).values
@@ -48,8 +48,8 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
 
-    # Reshape the predictions array (from (75000, 1) to (75000,))
-    y_pred = y_pred.ravel()  # Use .ravel() to flatten the array
+    # Reshape the predictions array to match the shape of y (from (75000, 1) to (75000,))
+    y_pred = y_pred.reshape(-1)  # Use .reshape(-1) to flatten the array
 
     # For binary classification, convert probabilities to 0 or 1 predictions
     y_pred = (y_pred > 0.5).astype(int)
