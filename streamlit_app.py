@@ -143,7 +143,6 @@ elif section == "Adversarial Attacks":
     else:
         st.info("The adversarial transaction is classified as Not Fraud.")
 
-
 # Explainability Section
 elif section == "Explainability":
     st.header("Explainability with SHAP")
@@ -151,17 +150,20 @@ elif section == "Explainability":
     # Create a SHAP explainer
     explainer = shap.KernelExplainer(model.predict, X_train_resampled[:100])  # Limit to 100 samples for faster SHAP calculations
     
-    # Feature importance plot
+    # Feature Importance Plot (SHAP Summary Plot)
     st.subheader("Feature Importance Plot (SHAP)")
     shap_values = explainer.shap_values(X_test[:100])  # Limit X_test for faster visualization
-    shap.summary_plot(shap_values, X_test[:100], show=False)
+    shap.summary_plot(shap_values, X_test[:100], feature_names=data.columns[:-1], show=False)
     st.pyplot()
-    
-    # Per-transaction explanation
+
+    # Per-Transaction Explanation
     st.subheader("Per-Transaction Explanation")
-    idx = st.slider("Select Transaction Index", 0, len(X_test)-1)
+    idx = st.slider("Select Transaction Index", 0, len(X_test) - 1)
     st.write(f"Transaction: {X_test[idx]}")
-    shap.force_plot(explainer.expected_value, shap_values[idx], X_test[idx], matplotlib=True)
+    
+    # SHAP values for the selected transaction
+    shap_value_single = explainer.shap_values(X_test[idx:idx + 1])
+    shap.force_plot(explainer.expected_value, shap_value_single, X_test[idx], matplotlib=True)
     st.pyplot()
 
 # Interactive Prediction Tool Section
@@ -183,5 +185,3 @@ elif section == "Interactive Prediction Tool":
     
     st.write(f"Prediction Probability: {pred_prob:.4f}")
     st.write(f"Prediction: {pred_label}")
-
-
