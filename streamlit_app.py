@@ -49,7 +49,7 @@ def get_model_performance(model, X, y):
     y_pred = model.predict(X)
 
     # Reshape the predictions array to match the shape of y (from (75000, 1) to (75000,))
-    y_pred = y_pred.reshape(-1,1)  # Use .reshape(-1) to flatten the array
+    y_pred = y_pred.reshape(-1)  # Flatten the array to shape (75000,)
 
     # For binary classification, convert probabilities to 0 or 1 predictions
     y_pred = (y_pred > 0.5).astype(int)
@@ -113,8 +113,10 @@ elif section == "Adversarial Attacks":
     idx = st.slider("Select Transaction Index", 0, len(X_adv)-1)
     st.write(f"Original Transaction: {X_test[idx]}")
     st.write(f"Adversarial Transaction: {X_adv[idx]}")
-    original_pred = model.predict([X_test[idx]])[0]
-    adv_pred = model.predict([X_adv[idx]])[0]
+    
+    # Get original and adversarial predictions
+    original_pred = model.predict(X_test[idx:idx+1])[0]  # Use a slice to maintain shape
+    adv_pred = model.predict(X_adv[idx:idx+1])[0]  # Use a slice to maintain shape
     st.write(f"Original Prediction: {'Fraud' if original_pred > 0.5 else 'Not Fraud'}")
     st.write(f"Adversarial Prediction: {'Fraud' if adv_pred > 0.5 else 'Not Fraud'}")
 
@@ -148,7 +150,7 @@ elif section == "Interactive Prediction Tool":
     
     # Predict fraud/not fraud
     transaction_input = np.array(transaction_input).reshape(1, -1)
-    pred = model.predict(transaction_input)[0]
+    pred = model.predict(transaction_input)[0]  # Keep shape consistent
     st.write(f"Prediction: {'Fraud' if pred > 0.5 else 'Not Fraud'}")
     
     # Show SHAP explanations for the prediction
