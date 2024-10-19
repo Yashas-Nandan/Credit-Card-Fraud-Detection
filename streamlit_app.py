@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-import zipfile36 as zipfile
 import tensorflow as tf
 
 
@@ -13,7 +12,7 @@ import tensorflow as tf
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
 
-data = pd.read_csv(csv_file)
+data = pd.read_csv('creditcard.csv')
 st.write(data)
 def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
     # Ensure the model is in evaluation mode
