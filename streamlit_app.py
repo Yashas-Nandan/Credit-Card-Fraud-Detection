@@ -108,6 +108,42 @@ if section == "Model Overview":
     plt.title("Confusion Matrix (Adversarial Data)")
     st.pyplot()
 
+# Adversarial Attacks Section
+elif section == "Adversarial Attacks":
+    st.header("Adversarial Attacks")
+    
+    # Before vs. After Attack Comparison
+    st.subheader("Before vs. After Attack")
+    st.write("Model accuracy before attack: ", round(clean_acc,2))
+    st.write("Model accuracy after attack: ", round(adv_acc,2))
+    
+    # Generate adversarial example
+    st.subheader("Adversarial Example")
+    idx = st.slider("Select Transaction Index", 0, len(X_adv)-1)
+    st.write(f"Original Transaction: {X_test[idx]}")
+    st.write(f"Adversarial Transaction: {X_adv[idx]}")
+    
+    # Reshape input for prediction
+    original_input = X_test[idx:idx+1]  # Ensure correct shape for model input
+    adversarial_input = X_adv[idx:idx+1]  # Ensure correct shape for model input
+    
+    # Get predictions
+    original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
+    adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
+    
+    # Indicate if the original prediction is fraud
+    if original_pred == 1:
+        st.success("The original transaction is classified as Fraud.")
+    else:
+        st.warning("The original transaction is classified as Not Fraud.")
+
+    # Indicate if the adversarial prediction is fraud
+    if adv_pred == 1:
+        st.error("The adversarial transaction is classified as Fraud.")
+    else:
+        st.info("The adversarial transaction is classified as Not Fraud.")
+
+
 # Explainability Section
 elif section == "Explainability":
     st.header("Explainability with SHAP")
@@ -148,37 +184,4 @@ elif section == "Interactive Prediction Tool":
     st.write(f"Prediction Probability: {pred_prob:.4f}")
     st.write(f"Prediction: {pred_label}")
 
-# Adversarial Attacks Section
-elif section == "Adversarial Attacks":
-    st.header("Adversarial Attacks")
-    
-    # Before vs. After Attack Comparison
-    st.subheader("Before vs. After Attack")
-    st.write("Model accuracy before attack: ", clean_acc)
-    st.write("Model accuracy after attack: ", adv_acc)
-    
-    # Generate adversarial example
-    st.subheader("Adversarial Example")
-    idx = st.slider("Select Transaction Index", 0, len(X_adv)-1)
-    st.write(f"Original Transaction: {X_test[idx]}")
-    st.write(f"Adversarial Transaction: {X_adv[idx]}")
-    
-    # Reshape input for prediction
-    original_input = X_test[idx:idx+1]  # Ensure correct shape for model input
-    adversarial_input = X_adv[idx:idx+1]  # Ensure correct shape for model input
-    
-    # Get predictions
-    original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
-    adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
-    
-    # Indicate if the original prediction is fraud
-    if original_pred == 1:
-        st.success("The original transaction is classified as Fraud.")
-    else:
-        st.warning("The original transaction is classified as Not Fraud.")
 
-    # Indicate if the adversarial prediction is fraud
-    if adv_pred == 1:
-        st.error("The adversarial transaction is classified as Fraud.")
-    else:
-        st.info("The adversarial transaction is classified as Not Fraud.")
