@@ -7,11 +7,12 @@ import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import tensorflow as tf
 
+
 # Load or train your model here
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-# Load dataset (replace with the uploaded file path)
-data = pd.read_csv('/mnt/data/creditcard2.csv')
+
+data = pd.read_csv('creditcard.csv')
 st.write(data)
 
 # Load the features and labels
@@ -47,8 +48,8 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
 def get_model_performance(model, X, y):
     y_pred = model.predict(X)
 
-    # Flatten the predictions array to match the shape of the target (n_samples,)
-    y_pred = y_pred.ravel()
+    # Reshape the predictions array (from (75000, 1) to (75000,))
+    y_pred = y_pred.ravel()  # Use .ravel() to flatten the array
 
     # For binary classification, convert probabilities to 0 or 1 predictions
     y_pred = (y_pred > 0.5).astype(int)
@@ -112,11 +113,8 @@ elif section == "Adversarial Attacks":
     idx = st.slider("Select Transaction Index", 0, len(X_adv)-1)
     st.write(f"Original Transaction: {X_test[idx]}")
     st.write(f"Adversarial Transaction: {X_adv[idx]}")
-    
-    # Flatten predictions for both original and adversarial transactions
-    original_pred = model.predict([X_test[idx]]).ravel()[0]
-    adv_pred = model.predict([X_adv[idx]]).ravel()[0]
-    
+    original_pred = model.predict([X_test[idx]])[0]
+    adv_pred = model.predict([X_adv[idx]])[0]
     st.write(f"Original Prediction: {'Fraud' if original_pred > 0.5 else 'Not Fraud'}")
     st.write(f"Adversarial Prediction: {'Fraud' if adv_pred > 0.5 else 'Not Fraud'}")
 
@@ -126,7 +124,6 @@ elif section == "Explainability":
     
     # Feature importance plot
     st.subheader("Feature Importance Plot (SHAP)")
-    explainer = shap.KernelExplainer(model.predict, X_test)
     shap_values = explainer.shap_values(X_test)
     shap.summary_plot(shap_values, X_test, show=False)
     st.pyplot()
@@ -151,7 +148,7 @@ elif section == "Interactive Prediction Tool":
     
     # Predict fraud/not fraud
     transaction_input = np.array(transaction_input).reshape(1, -1)
-    pred = model.predict(transaction_input).ravel()[0]
+    pred = model.predict(transaction_input)[0]
     st.write(f"Prediction: {'Fraud' if pred > 0.5 else 'Not Fraud'}")
     
     # Show SHAP explanations for the prediction
