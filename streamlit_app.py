@@ -1,4 +1,3 @@
-#SuhaasR-3009
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -14,11 +13,11 @@ model = tf.keras.models.load_model('fraud_detection_model.h5')
 
 # Load dataset
 data = pd.read_csv('creditcard.csv')  # Replace with your actual dataset path
-X = data.iloc[:,:-1].values  # Adjust to your actual features
-y = data.iloc[:,-1].values  # Adjust to your actual target column
+X = data.iloc[:, :-1].values  # Features
+y = data.iloc[:, -1].values  # Target labels
 
 # Split dataset into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
 # Function to create adversarial examples
 def generate_adversarial_examples(X, epsilon=0.1):
@@ -91,8 +90,9 @@ elif section == "Adversarial Attacks":
     idx = st.slider("Select Transaction Index", 0, len(X_adv)-1)
     st.write(f"Original Transaction: {X_test[idx]}")
     st.write(f"Adversarial Transaction: {X_adv[idx]}")
-    original_pred = (model.predict([X_test[idx]]) > 0.5).astype(int)[0][0]
-    adv_pred = (model.predict([X_adv[idx]]) > 0.5).astype(int)[0][0]
+    
+    original_pred = (model.predict(X_test[idx:idx+1]) > 0.5).astype(int)[0][0]  # Reshape input
+    adv_pred = (model.predict(X_adv[idx:idx+1]) > 0.5).astype(int)[0][0]  # Reshape input
     st.write(f"Original Prediction: {'Fraud' if original_pred == 1 else 'Not Fraud'}")
     st.write(f"Adversarial Prediction: {'Fraud' if adv_pred == 1 else 'Not Fraud'}")
 
