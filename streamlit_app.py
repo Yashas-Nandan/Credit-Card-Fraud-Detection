@@ -175,7 +175,7 @@ st.write(f"F1-Score: {adv_f1:.4f}")
 
 # Display confusion matrix for clean data
 st.subheader("Confusion Matrix for Clean Data")
- cm = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
 plt.title("Confusion Matrix (Clean Data)")
 st.pyplot()
