@@ -40,7 +40,7 @@ def get_model_performance(model, X, y):
     acc = accuracy_score(y, y_pred)
     precision = precision_score(y, y_pred)
     recall = recall_score(y, y_pred)
-    f1 = f1_score(y, y_pred)
+    f1 = f1_score(y, y_pred) 
     return acc, precision, recall, f1
 
 # Calculate initial performance metrics on clean data
