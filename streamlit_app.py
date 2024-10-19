@@ -98,8 +98,8 @@ X_adv_test = generate_adversarial_examples(X_test, epsilon=0.1)
 # Normalize adversarial examples to match the training data
 X_adv_test = scaler.transform(X_adv_test)
 
-# Create a SHAP explainer
-
+clean_acc, clean_precision, clean_recall, clean_f1, y_pred = get_model_performance(model, X_test, y_test, threshold=0.5)
+adv_acc, adv_precision, adv_recall, adv_f1, y_pred_adv = get_model_performance(model, X_adv_test, y_test, threshold=0.5)
 
 # Main Streamlit app
 st.title("Fraud Detection Model Dashboard")
@@ -107,6 +107,7 @@ st.title("Fraud Detection Model Dashboard")
 # Sidebar navigation
 st.sidebar.title("Navigation")
 section = st.sidebar.radio("Go to", ["Model Overview", "Adversarial Attacks", "Explainability", "Interactive Prediction Tool"])
+
 
 # Model Overview Section
 if section == "Model Overview":
@@ -171,6 +172,7 @@ elif section == "Adversarial Attacks":
     # Get predictions
     original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
     adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
+
     
     # Indicate if the original prediction is fraud
     if original_pred == 1:
