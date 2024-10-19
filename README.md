@@ -5,21 +5,21 @@ This repository implements a machine learning solution for detecting credit card
 
 ### Data Preprocessing
 
-- Data Loading & Inspection: Load and explore the dataset structure.
-- Missing Values: Handle missing data by removing rows or imputing values.
-- Feature Scaling: Standardize numeric features like Amount and Time.
-- Feature and Target Separation: Separate features (X) and target label (y).
-- Train-Test Split: Split data with stratification to preserve class balance.
-- Class Imbalance Handling: Apply SMOTE to generate synthetic samples for minority classes.
-- Optional Enhancements: Outlier detection, feature engineering, dimensionality reduction (PCA, t-SNE).
+- *Data Loading & Inspection:* Load and explore the dataset structure.
+- *Missing Values:* Handle missing data by removing rows or imputing values.
+- *Feature Scaling:* Standardize numeric features like Amount and Time.
+- *Feature and Target Separation:* Separate features (X) and target label (y).
+- *Train-Test Split:* Split data with stratification to preserve class balance.
+- *Class Imbalance Handling:* Apply SMOTE to generate synthetic samples for minority classes.
+- *Optional Enhancements:* Outlier detection, feature engineering, dimensionality reduction (PCA, t-SNE).
 
 ### Model Building
 
-- Neural Network: Custom architecture with multiple hidden layers and ReLU activation.
-- Binary Classification: Sigmoid function used in the output layer.
-- Model Compilation: Optimizer (Adam), loss function (binary crossentropy), and evaluation metrics (accuracy, AUC).
-- Class Weights: Optionally adjust class weights to handle imbalance during training.
-- Hyperparameter Tuning: Adjust learning rate, neurons, batch size for improved performance.
+- **Neural Network:** Custom architecture with multiple hidden layers and ReLU activation.
+- **Binary Classification:** Sigmoid function used in the output layer.
+- **Model Compilation:** Optimizer (Adam), loss function (binary crossentropy), and evaluation metrics (accuracy, AUC).
+- **Class Weights:** Optionally adjust class weights to handle imbalance during training.
+- **Hyperparameter Tuning:** Adjust learning rate, neurons, batch size for improved performance.
 
 ### Model Evaluation
 
