@@ -93,8 +93,6 @@ def get_model_performance(model, X, y, threshold=0.5):
     recall = recall_score(y, y_pred, zero_division=0)  # Handle zero division
     f1 = f1_score(y, y_pred, zero_division=0)  # Handle zero division
     return acc, precision, recall, f1, y_pred
-    
-clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
 
 # Generate adversarial examples for testing
 X_adv_test = generate_adversarial_examples(X_test, epsilon=0.1)
@@ -156,42 +154,42 @@ if section == "Model Overview":
 elif section == "Adversarial Attacks":
     st.header("Adversarial Attacks")
     
-    # Ensure X_adv and y_adv are defined; example dummy values
-    # You need to replace this with your actual method to generate adversarial examples
-    X_adv = X_test.copy()  # Replace with your method to generate adversarial examples
-    y_adv = y_test.copy()  # Replace with the true labels for the adversarial examples
+    # Ensure clean_acc is defined
+    if 'clean_acc' in locals():
+        st.subheader("Before vs. After Attack")
+        st.write("Model accuracy before attack: ", clean_acc)
+        
+        # Calculate adversarial performance
+        adv_acc, adv_precision, adv_recall, adv_f1, y_pred_adv = get_model_performance(model, X_adv_test, y_test, threshold=0.5)
+        st.write("Model accuracy after attack: ", adv_acc)
+        
+        # Generate adversarial example
+        st.subheader("Adversarial Example")
+        idx = st.slider("Select Transaction Index", 0, len(X_adv_test)-1)
+        st.write(f"Original Transaction: {X_test[idx]}")
+        st.write(f"Adversarial Transaction: {X_adv_test[idx]}")
+        
+        # Reshape input for prediction
+        original_input = X_test[idx:idx+1]  # Ensure correct shape for model input
+        adversarial_input = X_adv_test[idx:idx+1]  # Ensure correct shape for model input
+        
+        # Get predictions
+        original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
+        adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
+        
+        # Indicate if the original prediction is fraud
+        if original_pred == 1:
+            st.success("The original transaction is classified as Fraud.")
+        else:
+            st.warning("The original transaction is classified as Not Fraud.")
 
-    # Before vs. After Attack Comparison
-    st.subheader("Before vs. After Attack")
-    st.write("Model accuracy before attack: ", clean_acc)
-    adv_acc, adv_precision, adv_recall, adv_f1, _ = get_model_performance(model, X_adv, y_adv)
-    st.write("Model accuracy after attack: ", adv_acc)
-    
-    # Generate adversarial example
-    st.subheader("Adversarial Example")
-    idx = st.slider("Select Transaction Index", 0, len(X_adv)-1)
-    st.write(f"Original Transaction: {X_test[idx]}")
-    st.write(f"Adversarial Transaction: {X_adv[idx]}")
-    
-    # Reshape input for prediction
-    original_input = X_test[idx:idx+1]  # Ensure correct shape for model input
-    adversarial_input = X_adv[idx:idx+1]  # Ensure correct shape for model input
-    
-    # Get predictions
-    original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
-    adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
-    
-    # Indicate if the original prediction is fraud
-    if original_pred == 1:
-        st.success("The original transaction is classified as Fraud.")
+        # Indicate if the adversarial prediction is fraud
+        if adv_pred == 1:
+            st.error("The adversarial transaction is classified as Fraud.")
+        else:
+            st.info("The adversarial transaction is classified as Not Fraud.")
     else:
-        st.warning("The original transaction is classified as Not Fraud.")
-
-    # Indicate if the adversarial prediction is fraud
-    if adv_pred == 1:
-        st.error("The adversarial transaction is classified as Fraud.")
-    else:
-        st.info("The adversarial transaction is classified as Not Fraud.")
+        st.write("Model accuracy before the attack is not available.")
 
 # Explainability Section
 elif section == "Explainability":
