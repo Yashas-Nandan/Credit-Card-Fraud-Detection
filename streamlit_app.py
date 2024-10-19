@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,7 +11,7 @@ import tensorflow as tf
 # Load your trained model
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-# Load dataset
+# Load dataset (update the path if needed)
 data = pd.read_csv('creditcard2.csv')  # Replace with your actual dataset path
 X = data.iloc[:,:-1].values  # Adjust to your actual features
 y = data.iloc[:,-1].values  # Adjust to your actual target column
