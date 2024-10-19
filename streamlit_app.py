@@ -185,5 +185,4 @@ elif section == "Interactive Prediction Tool":
     pred_prob = model.predict(transaction_input_scaled)[0][0]
     pred_label = "Fraud" if pred_prob > 0.5 else "Not Fraud"
     
-    st.write(f"Prediction Probability: {pred_prob:.4f}")
     st.write(f"Prediction: {pred_label}")
