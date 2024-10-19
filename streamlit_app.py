@@ -6,18 +6,18 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
 # Load your trained model
-model = tf.keras.models.load_model('creditcard.h5')
+model = tf.keras.models.load_model('fraud_detection_model.h5')
 
 # Load dataset
-data = pd.read_csv('your_dataset.csv')  # Replace with your actual dataset path
-X = data[['amount', 'time', 'feature_1', 'feature_2', 'feature_3']].values  # Adjust to your actual features
-y = data['label'].values  # Adjust to your actual target column
+data = pd.read_csv('creditcard.csv')  # Replace with your actual dataset path
+X = data.iloc[:,:-1].values  # Adjust to your actual features
+y = data.iloc[:,-1].values  # Adjust to your actual target column
 
 # Split dataset into train and test sets
-from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Function to create adversarial examples
