@@ -42,7 +42,7 @@ def build_model():
 def train_model(X_train, y_train):
     model = build_model()
     class_weight = {0: 1, 1: 10}  # Give more weight to fraud cases
-    history = model.fit(X_train, y_train, epochs=10, batch_size=32, class_weight=class_weight, validation_split=0.2)
+    history = model.fit(X_train, y_train, epochs=3, batch_size=32, class_weight=class_weight, validation_split=0.2)
     return model, history
 
 # Train Random Forest model for comparison
