@@ -6,7 +6,7 @@ import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import tensorflow as tf
-import zipfile36
+import zipfile36 as zipfile
 # Load your pre-trained model
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
