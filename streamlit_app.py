@@ -39,6 +39,9 @@ def get_model_performance(model, X, y):
     f1 = f1_score(y, y_pred)
     return acc, precision, recall, f1
 
+# Calculate initial performance metrics on clean data
+clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
+
 # Create a SHAP explainer
 explainer = shap.Explainer(model, X_train)
 
@@ -54,7 +57,6 @@ if section == "Model Overview":
     st.header("Model Overview")
     
     # Display performance metrics on clean data
-    clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
     st.subheader("Performance on Clean Data")
     st.write(f"Accuracy: {clean_acc:.4f}")
     st.write(f"Precision: {clean_precision:.4f}")
@@ -83,6 +85,7 @@ elif section == "Adversarial Attacks":
     # Before vs. After Attack Comparison
     st.subheader("Before vs. After Attack")
     st.write("Model accuracy before attack: ", clean_acc)
+    adv_acc, adv_precision, adv_recall, adv_f1 = get_model_performance(model, X_adv, y_adv)
     st.write("Model accuracy after attack: ", adv_acc)
     
     # Generate adversarial example
