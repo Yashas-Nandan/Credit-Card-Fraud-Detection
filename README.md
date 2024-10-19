@@ -5,13 +5,13 @@ This repository implements a machine learning solution for detecting credit card
 
 ### Data Preprocessing
 
-- *Data Loading & Inspection:* Load and explore the dataset structure.
-- *Missing Values:* Handle missing data by removing rows or imputing values.
-- *Feature Scaling:* Standardize numeric features like Amount and Time.
-- *Feature and Target Separation:* Separate features (X) and target label (y).
-- *Train-Test Split:* Split data with stratification to preserve class balance.
-- *Class Imbalance Handling:* Apply SMOTE to generate synthetic samples for minority classes.
-- *Optional Enhancements:* Outlier detection, feature engineering, dimensionality reduction (PCA, t-SNE).
+- **Data Loading & Inspection:** Load and explore the dataset structure.
+- **Missing Values:** Handle missing data by removing rows or imputing values.
+- **Feature Scaling:** Standardize numeric features like Amount and Time.
+- **Feature and Target Separation:** Separate features (X) and target label (y).
+- **Train-Test Split:** Split data with stratification to preserve class balance.
+- **Class Imbalance Handling:** Apply SMOTE to generate synthetic samples for minority classes.
+- **Optional Enhancements:** Outlier detection, feature engineering, dimensionality reduction (PCA, t-SNE).
 
 ### Model Building
 
@@ -23,34 +23,34 @@ This repository implements a machine learning solution for detecting credit card
 
 ### Model Evaluation
 
-- Evaluation Metrics: Accuracy, precision, recall, F1-score, AUC-ROC.
-- Confusion Matrix: Analyze true/false positives and negatives.
-- AUC-ROC & Precision-Recall Curves: Visualize model performance.
-- SHAP Explainability: Understand feature importance and individual predictions.
+- **Evaluation Metrics:** Accuracy, precision, recall, F1-score, AUC-ROC.
+- **Confusion Matrix:** Analyze true/false positives and negatives.
+- **AUC-ROC & Precision-Recall Curves:** Visualize model performance.
+- **SHAP Explainability:** Understand feature importance and individual predictions.
 
 ### Fine-Tuning
 
-- Hyperparameter Optimization: Use GridSearchCV or RandomSearch for optimal parameters.
-- Regularization: L2 regularization and dropout to prevent overfitting.
-- Early Stopping: Stop training when validation performance ceases to improve.
+- **Hyperparameter Optimization:** Use GridSearchCV or RandomSearch for optimal parameters.
+- **Regularization:** L2 regularization and dropout to prevent overfitting.
+- **Early Stopping:** Stop training when validation performance ceases to improve.
 
 ### Model Deployment
 
-- Real-Time Predictions: User inputs transaction data for immediate fraud detection.
-- UI Features: Confusion matrix, AUC-ROC, SHAP visualizations.
-- User Authentication: Optional security feature for access.
-- Deployment: Host the app on Streamlit Cloud or any other cloud provider.
+- **Real-Time Predictions:** User inputs transaction data for immediate fraud detection.
+- **UI Features:** Confusion matrix, AUC-ROC, SHAP visualizations.
+- **User Authentication:** Optional security feature for access.
+- **Deployment:** Host the app on Streamlit Cloud or any other cloud provider.
 
 ### Advanced Enhancements
 
-- Adversarial Defense: Techniques like adversarial training and gradient masking.
-- Ensemble Models: Optionally integrate Random Forest or Gradient Boosting models for comparison.
+- **Adversarial Defense:** Techniques like adversarial training and gradient masking.
+- **Ensemble Models:** Optionally integrate Random Forest or Gradient Boosting models for comparison.
 
 ### Presentation & Documentation
 
-- Project Overview: Summarize goals, challenges, and solutions.
-- Model Architecture: Explain network structure and preprocessing steps.
-- Live Demo: Real-time fraud detection using the Streamlit app.
+- **Project Overview:** Summarize goals, challenges, and solutions.
+- **Model Architecture:** Explain network structure and preprocessing steps.
+- **Live Demo:** Real-time fraud detection using the Streamlit app.
 
 # Authors
 1. Prashanth S (BMSCE)
