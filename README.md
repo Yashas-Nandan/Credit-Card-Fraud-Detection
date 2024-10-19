@@ -46,12 +46,6 @@ This repository implements a machine learning solution for detecting credit card
 - **Adversarial Defense:** Techniques like adversarial training and gradient masking.
 - **Ensemble Models:** Optionally integrate Random Forest or Gradient Boosting models for comparison.
 
-### Presentation & Documentation
-
-- **Project Overview:** Summarize goals, challenges, and solutions.
-- **Model Architecture:** Explain network structure and preprocessing steps.
-- **Live Demo:** Real-time fraud detection using the Streamlit app.
-
 # Authors
 1. Prashanth S (BMSCE)
 2. Yashas Nandan S (BMSCE)
