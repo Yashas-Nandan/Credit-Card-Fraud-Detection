@@ -13,7 +13,7 @@ model = tf.keras.models.load_model('fraud_detection_model.h5')
 
 with st.expander('Data'):
     data = pd.read_csv('creditcard.csv')
-    st.write('**Raw data**')
+    st.write(data)
 
 # Load the features and labels
 X_test = data.drop('Class', axis=1).values
