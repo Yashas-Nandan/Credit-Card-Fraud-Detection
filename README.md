@@ -51,7 +51,7 @@ https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud
 
 # References
 
-Libraries used can be found in requirements.txt
+- Libraries used can be found in requirements.txt
 
 
 # Authors
