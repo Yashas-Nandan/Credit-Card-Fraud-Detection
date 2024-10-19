@@ -94,10 +94,29 @@ elif section == "Adversarial Attacks":
     st.write(f"Original Transaction: {X_test[idx]}")
     st.write(f"Adversarial Transaction: {X_adv[idx]}")
     
-    original_pred = (model.predict(X_test[idx:idx+1]) > 0.5).astype(int)[0][0]  # Reshape input
-    adv_pred = (model.predict(X_adv[idx:idx+1]) > 0.5).astype(int)[0][0]  # Reshape input
+    # Reshape input for prediction
+    original_input = X_test[idx:idx+1]  # Ensure correct shape for model input
+    adversarial_input = X_adv[idx:idx+1]  # Ensure correct shape for model input
+    
+    # Get predictions
+    original_pred = (model.predict(original_input) > 0.5).astype(int)[0][0]  # Reshape input
+    adv_pred = (model.predict(adversarial_input) > 0.5).astype(int)[0][0]  # Reshape input
+
+    # Display predictions
     st.write(f"Original Prediction: {'Fraud' if original_pred == 1 else 'Not Fraud'}")
     st.write(f"Adversarial Prediction: {'Fraud' if adv_pred == 1 else 'Not Fraud'}")
+    
+    # Indicate if the original prediction is fraud
+    if original_pred == 1:
+        st.success("The original transaction is classified as Fraud.")
+    else:
+        st.warning("The original transaction is classified as Not Fraud.")
+
+    # Indicate if the adversarial prediction is fraud
+    if adv_pred == 1:
+        st.error("The adversarial transaction is classified as Fraud.")
+    else:
+        st.info("The adversarial transaction is classified as Not Fraud.")
 
 # Explainability Section
 elif section == "Explainability":
