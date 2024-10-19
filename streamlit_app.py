@@ -99,7 +99,6 @@ X_adv_test = generate_adversarial_examples(X_test, epsilon=0.1)
 X_adv_test = scaler.transform(X_adv_test)
 
 # Create a SHAP explainer
-explainer = shap.KernelExplainer(model.predict, X_train_resampled[:100])  # Limit to 100 samples for faster SHAP calculations
 
 # Main Streamlit app
 st.title("Fraud Detection Model Dashboard")
