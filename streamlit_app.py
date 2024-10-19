@@ -6,7 +6,6 @@ import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
-from imblearn.over_sampling import SMOTE  # Import SMOTE
 import tensorflow as tf
 
 # Load your trained model
@@ -17,27 +16,8 @@ data = pd.read_csv('creditcard.csv')  # Replace with your actual dataset path
 X = data.iloc[:, :-1].values  # Features
 y = data.iloc[:, -1].values  # Target labels
 
-# Separate the fraud and non-fraud transactions
-fraud_cases = data[data['Class'] == 1]
-non_fraud_cases = data[data['Class'] == 0]
-
-# Limit the number of fraud cases in the test set to 1
-test_fraud_case = fraud_cases.sample(n=1, random_state=42)
-
-# Use the rest of the non-fraud cases for testing
-non_fraud_cases_test = non_fraud_cases.sample(n=len(non_fraud_cases) - 1, random_state=42)
-
-# Combine test set
-X_test = np.vstack((test_fraud_case.iloc[:, :-1].values, non_fraud_cases_test.iloc[:, :-1].values))
-y_test = np.hstack((test_fraud_case.iloc[:, -1].values, non_fraud_cases_test.iloc[:, -1].values))
-
-# Split the remaining non-fraud cases for training
-X_train = non_fraud_cases.drop(test_fraud_case.index).iloc[:, :-1].values
-y_train = non_fraud_cases.drop(test_fraud_case.index).iloc[:, -1].values
-
-# Apply SMOTE to the training set
-smote = SMOTE(random_state=42)
-X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+# Split dataset into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
 # Function to create adversarial examples
 def generate_adversarial_examples(X, epsilon=0.1):
@@ -63,7 +43,7 @@ def get_model_performance(model, X, y):
 clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
 
 # Create a SHAP explainer
-explainer = shap.Explainer(model, X_train_resampled)
+explainer = shap.Explainer(model, X_train)
 
 # Main app
 st.title("Fraud Detection Model Dashboard")
