@@ -7,7 +7,23 @@ import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # Load or train your model here
-# Assume you have model, X_train, y_train, X_test, y_test, X_adv, y_adv
+model = load_model('fraud_detection_model.h5')
+
+import tensorflow as tf
+
+# Load the pre-trained model
+model = tf.keras.models.load_model('fraud_detection_model.h5')
+import pandas as pd
+import numpy as np
+
+# Load your credit card dataset
+# Replace 'credit_card_data.csv' with the path to your dataset
+data = pd.read_csv('creditcard.csv')
+
+# Assume 'features' are in the columns except the label column
+# and 'label' is the target variable
+X_test = data.drop('Class', axis=1).values  # Features
+y_test = data['Class'].values
 
 # Function to calculate model performance
 def get_model_performance(model, X, y):
