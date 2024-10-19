@@ -43,7 +43,7 @@ This repository implements a machine learning solution for detecting credit card
 
 ### Advanced Enhancements
 
-- **Adversarial Defense:** Techniques like adversarial training and gradient masking.
+- **Adversarial Defense:** Techniques like adversarial training.
 
 # Dataset
 
