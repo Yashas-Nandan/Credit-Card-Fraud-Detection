@@ -17,8 +17,23 @@ data = pd.read_csv('creditcard.csv')  # Replace with your actual dataset path
 X = data.iloc[:, :-1].values  # Features
 y = data.iloc[:, -1].values  # Target labels
 
-# Split dataset into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+# Separate the fraud and non-fraud transactions
+fraud_cases = data[data['Class'] == 1]
+non_fraud_cases = data[data['Class'] == 0]
+
+# Limit the number of fraud cases in the test set to 1
+test_fraud_case = fraud_cases.sample(n=1, random_state=42)
+
+# Use the rest of the non-fraud cases for testing
+non_fraud_cases_test = non_fraud_cases.sample(n=len(non_fraud_cases) - 1, random_state=42)
+
+# Combine test set
+X_test = np.vstack((test_fraud_case.iloc[:, :-1].values, non_fraud_cases_test.iloc[:, :-1].values))
+y_test = np.hstack((test_fraud_case.iloc[:, -1].values, non_fraud_cases_test.iloc[:, -1].values))
+
+# Split the remaining non-fraud cases for training
+X_train = non_fraud_cases.drop(test_fraud_case.index).iloc[:, :-1].values
+y_train = non_fraud_cases.drop(test_fraud_case.index).iloc[:, -1].values
 
 # Apply SMOTE to the training set
 smote = SMOTE(random_state=42)
