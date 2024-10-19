@@ -6,6 +6,7 @@ import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE  # Import SMOTE
 import tensorflow as tf
 
 # Load your trained model
@@ -18,6 +19,13 @@ y = data.iloc[:, -1].values  # Target labels
 
 # Split dataset into train and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# Apply SMOTE to the training set
+smote = SMOTE(random_state=42)
+X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+
+# Get the indices of fraud cases in the test set
+fraud_indices = np.where(y_test == 1)[0]
 
 # Function to create adversarial examples
 def generate_adversarial_examples(X, epsilon=0.1):
@@ -43,7 +51,7 @@ def get_model_performance(model, X, y):
 clean_acc, clean_precision, clean_recall, clean_f1 = get_model_performance(model, X_test, y_test)
 
 # Create a SHAP explainer
-explainer = shap.Explainer(model, X_train)
+explainer = shap.Explainer(model, X_train_resampled)
 
 # Main app
 st.title("Fraud Detection Model Dashboard")
@@ -77,6 +85,12 @@ if section == "Model Overview":
     sns.barplot(x=fraud_count.index, y=fraud_count.values)
     plt.title('Distribution of Fraud vs Non-Fraud Transactions')
     st.pyplot()
+
+    # Display the indices where fraud appears
+    if len(fraud_indices) > 0:
+        st.write("Fraud Indices in Test Set:", fraud_indices)
+    else:
+        st.write("No fraud cases in the test set.")
 
 # Adversarial Attacks Section
 elif section == "Adversarial Attacks":
