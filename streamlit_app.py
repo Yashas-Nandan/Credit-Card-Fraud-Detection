@@ -25,23 +25,24 @@ def generate_adversarial_examples(model, X_test, y_test, epsilon=0.1):
     X_test_tensor = tf.convert_to_tensor(X_test, dtype=tf.float32)
     y_test_tensor = tf.convert_to_tensor(y_test, dtype=tf.float32)
 
-    # Create a gradient tape to record operations
     with tf.GradientTape() as tape:
-        # Make predictions on the test set
         tape.watch(X_test_tensor)
         predictions = model(X_test_tensor)
-        loss = tf.keras.losses.binary_crossentropy(y_test_tensor, predictions)
-    
-    # Calculate gradients of the loss with respect to the input
-    gradients = tape.gradient(loss, X_test_tensor)
 
-    # Generate adversarial examples by adding perturbations to the original input
+        # Ensure predictions are shaped correctly
+        if len(predictions.shape) == 1:  # If predictions are (n_samples,)
+            predictions = tf.expand_dims(predictions, axis=-1)  # Shape (n_samples, 1)
+        
+        loss = tf.keras.losses.binary_crossentropy(y_test_tensor, predictions)
+
+    # Calculate gradients
+    gradients = tape.gradient(loss, X_test_tensor)
     X_adv = X_test + epsilon * tf.sign(gradients)
 
-    # Clip the values to ensure they remain within the valid range
-    X_adv = tf.clip_by_value(X_adv, 0, 1)  # Assuming inputs are normalized to [0, 1]
+    # Clip values to ensure they remain in the valid range
+    X_adv = tf.clip_by_value(X_adv, 0, 1)
 
-    return X_adv.numpy(), y_test  # Return as numpy arrays
+    return X_adv.numpy(), y_test 
 
 
 # Function to calculate model performance
