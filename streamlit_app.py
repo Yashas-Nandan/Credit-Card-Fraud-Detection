@@ -11,9 +11,9 @@ import tensorflow as tf
 # Load or train your model here
 model = tf.keras.models.load_model('fraud_detection_model.h5')
 
-
-data = pd.read_csv('creditcard.csv')
-st.write(data)
+with st.expander('Data'):
+    data = pd.read_csv('creditcard.csv')
+    st.write('**Raw data**')
 
 # Load the features and labels
 X_test = data.drop('Class', axis=1).values
