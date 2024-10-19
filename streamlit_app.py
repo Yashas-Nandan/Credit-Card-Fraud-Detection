@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import shap
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-import zipfile
 import tensorflow as tf
 
 # Load your pre-trained model
